@@ -499,7 +499,10 @@ _print("request_entities",entities);
               collection = _db.collection.sync(_db, "User");
               var cursor = collection.find.sync(collection,{'_id':{$in:recipientsObjectId}},{'userDeviceTokens':1,_id:0});
               var tokens = cursor.toArray.sync(cursor);
-              _print("Tokens are ",tokens);
+              
+              cursor.forEach.sync(cursor,function(doc){
+                _print("Tokens are ",doc);
+              });
             });
           }
         } catch (e) {
