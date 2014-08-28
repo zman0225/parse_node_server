@@ -543,7 +543,7 @@ _print("request_entities",entities);
                 setTimeout(
                   function(){           
                     apnConnection.pushNotification(note, tokensToDeliver);
-                  },1000}
+                  },1000);
               };
 
               send.sync(null);
