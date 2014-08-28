@@ -502,7 +502,7 @@ _print("request_entities",entities);
               var tokensToDeliver = [];
 
               for (var y in tokens) {
-                if(tokens.hasOwnProperty(y)){
+                if(tokens.hasOwnProperty(y)&&_exists(tokens[i])){
                   tokensToDeliver.push(tokens[i].userDeviceTokens);
                 }
               };
