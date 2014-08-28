@@ -545,7 +545,7 @@ _print("request_entities",entities);
                 },1000);
               }
               timedSend.sync(null);
-              _print("Tokens are ",tokensToDeliver);
+              console.log("Tokens are "+tokensToDeliver);
 
 
             });
