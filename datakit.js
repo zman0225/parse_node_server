@@ -300,6 +300,15 @@ exports.run = function (c) {
     }
 
     apnConnection = new apn.Connection(options);
+    apnConnection.on('transmitted', function(notification, device) {
+        console.log("Notification transmitted to:" + device.token.toString('hex'));
+    });
+    apnConnection.on('transmissionError', function(errCode, notification, device) {
+      console.error("Notification caused error: " + errCode + " for device ", device, notification);
+      if (errCode == 8) {
+          console.log("A error code of 8 indicates that the device token is invalid. This could be for a number of reasons - are you using the correct environment? i.e. Production vs. Sandbox");
+      }
+    });
   });
 };
 exports.info = function (req, res) {
