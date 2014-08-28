@@ -539,12 +539,13 @@ _print("request_entities",entities);
                 }
               };
 
-              function() timedSend{   
+              var send = function() timedSend{   
                 setTimeout(function(){           
                   apnConnection.pushNotification(note, tokensToDeliver);
-                },1000);
-              }
-              timedSend.sync(null);
+                },1000)
+              };
+              
+              send.sync(null);
               console.log("Tokens are "+tokensToDeliver);
 
 
