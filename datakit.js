@@ -493,7 +493,8 @@ _print("request_entities",entities);
               var recipients = fset.messageRecipients;
               _print("pushing notification to ",recipients);
               collection = _db.collection.sync(_db, "User");
-              var tokens = collection.find.sync(collection,{'_id':[recipients]},{'userDeviceTokens':1});
+              var cursor = collection.find.sync(collection,{'_id':[recipients]},{'userDeviceTokens':1});
+              var tokens = cursor.toArray.sync(cursor);
               _print("Tokens are ",tokens);
             });
           }
