@@ -497,7 +497,7 @@ _print("request_entities",entities);
               };
               _print("pushing notification to ",recipientsObjectId);
               collection = _db.collection.sync(_db, "User");
-              var cursor = collection.find.sync(collection,{'_id':{$in:[recipientsObjectId]}},{'userDeviceTokens':1,_id:0});
+              var cursor = collection.find.sync(collection,{'_id':{$in:recipientsObjectId}},{'userDeviceTokens':1,_id:0});
               var tokens = cursor.toArray.sync(cursor);
               _print("Tokens are ",tokens);
             });
