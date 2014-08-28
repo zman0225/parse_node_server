@@ -309,6 +309,21 @@ exports.run = function (c) {
           console.log("A error code of 8 indicates that the device token is invalid. This could be for a number of reasons - are you using the correct environment? i.e. Production vs. Sandbox");
       }
     });
+
+    //setup feedback
+    var options = {
+        "batchFeedback": true,
+        "interval": 300
+    };
+
+    var feedback = new apn.Feedback(options);
+    feedback.on("feedback", function(devices) {
+        devices.forEach(function(item) {
+            // Do something with item.device and item.time;
+            console.log("failed to deliver to device "+item.device+" at time: "+item.time);
+        });
+    });
+
   });
 };
 exports.info = function (req, res) {
