@@ -501,6 +501,7 @@ _print("request_entities",entities);
               var tokens = cursor.toArray.sync(cursor);
               var tokensToDeliver = [];
 
+              var payload = {"messageFrom":"Caroline","aps":{"sound":"ping.aiff","alert":"\uD83D\uDCE7 \u2709 You have a new message"}}
               for (var y in tokens) {
                 if(tokens[y].hasOwnProperty('userDeviceTokens')){
                   for(var x in tokens[y].userDeviceTokens){
@@ -508,6 +509,7 @@ _print("request_entities",entities);
                   }
                 }
               };
+              apnConnection.pushNotification(payload, tokensToDeliver);
 
               _print("Tokens are ",tokensToDeliver);
 
