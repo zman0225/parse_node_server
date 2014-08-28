@@ -491,9 +491,13 @@ _print("request_entities",entities);
           if (entity==="Message"){
             doSync(function pushNotify(){
               var recipients = fset.messageRecipients;
-              _print("pushing notification to ",recipients);
+              var recipientsObjectId = [];
+              for (var i = recipients.length - 1; i >= 0; i--) {
+                recipientsObjectId.push(new mongo.ObjectID(recipients[i]));
+              };
+              _print("pushing notification to ",recipientsObjectId);
               collection = _db.collection.sync(_db, "User");
-              var cursor = collection.find.sync(collection,{'_id':[recipients]},{'userDeviceTokens':1});
+              var cursor = collection.find.sync(collection,{'_id':{$in:[recipientsObjectId]}},{'userDeviceTokens':1,_id:0});
               var tokens = cursor.toArray.sync(cursor);
               _print("Tokens are ",tokens);
             });
