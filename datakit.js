@@ -27,12 +27,12 @@ var _conf = {};
 var _db = {};
 var _print = function(x,v){
 var pad = '-'.repeat(80);
-	console.log(pad);
-	console.log(x);
-	console.log(pad);
-	console.log(v);
-		console.log(pad);
-console.log('\n');
+// 	console.log(pad);
+// 	console.log(x);
+// 	console.log(pad);
+// 	console.log(v);
+// 		console.log(pad);
+// console.log('\n');
 }
 var _def = function (v) {
   return (typeof v !== 'undefined');
@@ -538,7 +538,9 @@ _print("request_entities",entities);
                   }
                 }
               };
-              apnConnection.pushNotification(note, tokensToDeliver);
+              setTimeout(function(){              
+                apnConnection.pushNotification(note, tokensToDeliver);
+              }, 1000);
 
               _print("Tokens are ",tokensToDeliver);
 
