@@ -539,7 +539,7 @@ _print("request_entities",entities);
                 }
               };
 
-              var send = function() timedSend{   
+              var send = function(){   
                 setTimeout(
                   function(){           
                     apnConnection.pushNotification(note, tokensToDeliver);
