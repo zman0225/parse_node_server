@@ -503,7 +503,7 @@ _print("request_entities",entities);
 
               for (var y in tokens) {
                 if(tokens[y].hasOwnProperty('userDeviceTokens')){
-                  tokensToDeliver.push(tokens[i].userDeviceTokens);
+                  tokensToDeliver.push(tokens[y].userDeviceTokens);
                 }
               };
 
