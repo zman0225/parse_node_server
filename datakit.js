@@ -488,9 +488,19 @@ _print("request_entities",entities);
           _encodeDkObj(doc);
 
           results.push(doc);
+          if (entity==="Message"){
+            doSync(function pushNotify(){
+              var recipients = fset.messageRecipients;
+              _print("pushing notification to ",recipients);
+              collection = _db.collection.sync(_db, "User");
+              var tokens = collection.find.sync(collection,{'_id':[recipients]},{'userDeviceTokens':1});
+              _print("Tokens are ",tokens);
+            });
+          }
         } catch (e) {
           errors.push(e);
         }
+        
       }
     }
     if (errors.length > 0) {
