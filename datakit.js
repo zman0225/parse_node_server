@@ -501,7 +501,12 @@ _print("request_entities",entities);
               var tokens = cursor.toArray.sync(cursor);
               var tokensToDeliver = [];
 
-              var payload = {"messageFrom":"Caroline","aps":{"sound":"ping.aiff","alert":"\uD83D\uDCE7 \u2709 You have a new message"}}
+              var note = new apn.Notification();
+
+              note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+              note.sound = "ping.aiff";
+              note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
+              note.payload = {'messageFrom': fset.messageSender};
               for (var y in tokens) {
                 if(tokens[y].hasOwnProperty('userDeviceTokens')){
                   for(var x in tokens[y].userDeviceTokens){
@@ -509,7 +514,7 @@ _print("request_entities",entities);
                   }
                 }
               };
-              apnConnection.pushNotification(payload, tokensToDeliver);
+              apnConnection.pushNotification(note, tokensToDeliver);
 
               _print("Tokens are ",tokensToDeliver);
 
