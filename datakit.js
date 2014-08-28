@@ -18,7 +18,9 @@ var crypto = require('crypto');
 var fs = require('fs');
 var doSync = require('sync');
 var uuid = require('node-uuid');
+var apn = require('apn');
 var app = {};
+var apnConnection = {};
 
 // private functions
 var _conf = {};
@@ -236,16 +238,19 @@ exports.run = function (c) {
     _conf.allowDrop = _safe(c.allowDrop, false);
     _conf.cert = _safe(c.cert, null);
     _conf.key = _safe(c.key, null);
+    _conf.push_cert = _safe(c.push_cert,null);
+    _conf.push_key = _safe(c.push_key,null);
     _conf.express = _safe(c.express, function (app) {});
 
     if (_exists(_conf.cert) && _exists(_conf.key)) {
       app = express.createServer({
         'key': fs.readFileSync(_conf.key),
-        'cert': fs.readFileSync(_conf.cert)
+        'cert': fs.readFileSync(_conf.cert),
       });
     } else {
       app = express.createServer();
     }
+
 
     // Install the body parser
     parse = express.bodyParser();
@@ -284,6 +289,17 @@ exports.run = function (c) {
     } catch (e) {
       console.error(e);
     }
+
+    //setup push notification
+        console.log(nl + pad + nl + 'Push Setup' + nl + pad);
+    var options = {};
+    if (_exists(_conf.push_key)&&_exists(_conf.push_cert)){
+      options = { "production": false,"key":_conf.push_key,"cert":_conf.push_cert };
+    }else{
+      options = {"production":false};
+    }
+
+    apnConnection = new apn.Connection(options);
   });
 };
 exports.info = function (req, res) {
@@ -376,8 +392,9 @@ exports.saveObject = function (req, res) {
     entities = req.body;
     results = [];
     errors = [];
-
+_print("request_entities",entities);
     for (i in entities) {
+      _print("entity",entities[i]);
       if (entities.hasOwnProperty(i)) {
         ent = entities[i];
         entity = _safe(ent.entity, null);
@@ -479,7 +496,7 @@ exports.saveObject = function (req, res) {
     if (errors.length > 0) {
       return _e(res, _ERR.OPERATION_FAILED, errors.pop());
     }
-          _print("saveObject",results);
+          
 
     res.json(results, 200);
   });
