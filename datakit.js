@@ -27,12 +27,12 @@ var _conf = {};
 var _db = {};
 var _print = function(x,v){
 var pad = '-'.repeat(80);
-// 	console.log(pad);
-// 	console.log(x);
-// 	console.log(pad);
-// 	console.log(v);
-// 		console.log(pad);
-// console.log('\n');
+	console.log(pad);
+	console.log(x);
+	console.log(pad);
+	console.log(v);
+		console.log(pad);
+console.log('\n');
 }
 var _def = function (v) {
   return (typeof v !== 'undefined');
@@ -416,7 +416,7 @@ exports.saveObject = function (req, res) {
     entities = req.body;
     results = [];
     errors = [];
-_print("request_entities",entities);
+// _print("request_entities",entities);
     for (i in entities) {
       _print("entity",entities[i]);
       if (entities.hasOwnProperty(i)) {
@@ -585,7 +585,7 @@ exports.deleteObject = function (req, res) {
     try {
       collection = _db.collection.sync(_db, entity);
       result = collection.remove.sync(collection, {'_id': oid}, {'safe': true});
-      		      _print("delete","deleted");
+      		      // _print("delete","deleted");
 
 
       res.send('', 200);
@@ -629,8 +629,8 @@ exports.refreshObject = function (req, res) {
 };
 exports.query = function (req, res) {
   doSync(function querySync() {
-  _print("params",JSON.stringify(req.body,null,4));
-  _print("url",req.params);
+  _print("query",JSON.stringify(req.body,null,4));
+  _print("query_url",req.params);
     var entity, doFindOne, doCount, query, opts, or, and, refIncl, fieldInclExcl, sort, skip, limit, mr, mrOpts, sortValues, order, results, cursor, collection, result, key, resultCount, i, j, field, dbRef, resolved;
     entity = req.param('entity', null);
     if (!_exists(entity)) {
@@ -686,7 +686,7 @@ exports.query = function (req, res) {
       //             JSON.stringify(opts));
 
       collection = _db.collection.sync(_db, entity);
-		_print("collection ent is",entity);
+		// _print("collection ent is",entity);
       if (mr !== null) {
         mrOpts = {
           'query': query,
@@ -715,9 +715,9 @@ exports.query = function (req, res) {
         if (doFindOne) {
           opts.limit = 1;
         }
-                  _print("query from find",JSON.stringify(query,null,4));
-                  _print("opts from find",opts);
-				_print("fieldIncExcl",fieldInclExcl);
+    //               _print("query from find",JSON.stringify(query,null,4));
+    //               _print("opts from find",opts);
+				// _print("fieldIncExcl",fieldInclExcl);
         if (fieldInclExcl !== null) {
           cursor = collection.find.sync(collection, query, fieldInclExcl, opts);
         } else {
@@ -764,7 +764,7 @@ exports.query = function (req, res) {
       }
 
       _encodeDkObj(results);
-      _print("query",results);
+      _print("query_results",results);
 	  
       return res.json(results, 200);
     } catch (e) {
@@ -849,7 +849,7 @@ exports.store = function (req, res) {
     if (fileName === null) {
       fileName = uuid.v4();
     }
-
+    _print("storing file",fileName);
     store = null;
     bufs = [];
     onEnd = false;
