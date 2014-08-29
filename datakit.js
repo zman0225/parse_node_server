@@ -294,9 +294,9 @@ exports.run = function (c) {
         console.log(nl + pad + nl + 'Push Setup' + nl + pad);
     var options = {};
     if (_exists(_conf.push_key)&&_exists(_conf.push_cert)){
-      options = { "production": false,"key":_conf.push_key,"cert":_conf.push_cert };
+      options = { "production": true,"key":_conf.push_key,"cert":_conf.push_cert };
     }else{
-      options = {"production":false};
+      options = {"production":true};
     }
 
     apnConnection = new apn.Connection(options);
