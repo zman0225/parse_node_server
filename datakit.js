@@ -294,9 +294,9 @@ exports.run = function (c) {
         console.log(nl + pad + nl + 'Push Setup' + nl + pad);
     var options = {};
     if (_exists(_conf.push_key)&&_exists(_conf.push_cert)){
-      options = { "production": false,"key":_conf.push_key,"cert":_conf.push_cert };
+      options = { "production": true,"key":_conf.push_key,"cert":_conf.push_cert };
     }else{
-      options = {"production":false};
+      options = {"production":true};
     }
 
     apnConnection = new apn.Connection(options);
@@ -539,6 +539,8 @@ _print("request_entities",entities);
                 }
               };
 
+              console.log("Tokens are "+tokensToDeliver);
+
               var send = function(){   
                 setTimeout(
                   function(){           
@@ -547,7 +549,6 @@ _print("request_entities",entities);
               };
 
               send.sync(null);
-              console.log("Tokens are "+tokensToDeliver);
 
 
             });
