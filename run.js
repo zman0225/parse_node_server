@@ -6,6 +6,6 @@ require("./datakit").run({
   "salt": "cfgsalt",
   'allowDestroy': true,
   'allowDrop': true,
-  'push_key':"./push_ssl/key.pem",
-  'push_cert':"./push_ssl/cert.pem",
+  'push_key':"./push_production_ssl/key.pem",
+  'push_cert':"./push_production_ssl/cert.pem",
 });
