@@ -295,10 +295,10 @@ exports.run = function (c) {
     var options = {};
 
     if (_exists(_conf.push_key)&&_exists(_conf.push_cert)){
-      options = { "production": false,"key":_conf.push_key,"cert":_conf.push_cert };
+      options = { "production": true,"key":_conf.push_key,"cert":_conf.push_cert };
       // options = { "production": true,"key":_conf.push_key,"cert":_conf.push_cert };
     }else{
-      options = { "production": false,"key":_conf.push_key,"cert":_conf.push_cert };
+      options = { "production": true,"key":_conf.push_key,"cert":_conf.push_cert };
       // options = {"production":true};
     }
 
