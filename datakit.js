@@ -530,8 +530,26 @@ exports.saveObject = function (req, res) {
 
               note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
               note.sound = "ping.aiff";
-              note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
-              note.payload = {'messageFrom': fset.messageSender};
+              switch(fset.messageType){
+                case "Snap":
+                  note.alert = "A New Snap!";
+                  break;
+                case "TextMessage":
+                  note.alert = "A New Message!";
+                  break;
+                case "messageAnonymousClass":
+                  note.alert = "A Secret Whisper!";
+                  break;
+                case "LocationClass":
+                  note.alert = "A New Location!";
+                  break;
+                case "LocationRequestClass":
+                  note.alert = "A New Where!";
+                  break;       
+              }
+              
+              var sender = _safe(fset.messageSenderName,fset.messageSender);
+              note.payload = {'msgFrom': sender,'msgType',fset.messageType};
               for (var y in tokens) {
                 if(tokens[y].hasOwnProperty('userDeviceTokens')){
                   for(var x in tokens[y].userDeviceTokens){
