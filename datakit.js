@@ -241,7 +241,7 @@ exports.run = function (c) {
     _conf.push_cert = _safe(c.push_cert,null);
     _conf.push_key = _safe(c.push_key,null);
     _conf.express = _safe(c.express, function (app) {});
-
+    _conf.productionMode = _safe(c.productionMode,false);
     if (_exists(_conf.cert) && _exists(_conf.key)) {
       app = express.createServer({
         'key': fs.readFileSync(_conf.key),
@@ -295,11 +295,9 @@ exports.run = function (c) {
     var options = {};
 
     if (_exists(_conf.push_key)&&_exists(_conf.push_cert)){
-      options = { "production": true,"key":_conf.push_key,"cert":_conf.push_cert };
-      // options = { "production": true,"key":_conf.push_key,"cert":_conf.push_cert };
+      options = { "production": _conf.productionMode,"key":_conf.push_key,"cert":_conf.push_cert };
     }else{
-      options = { "production": true,"key":_conf.push_key,"cert":_conf.push_cert };
-      // options = {"production":true};
+      options = { "production": _conf.productionMode,"key":_conf.push_key,"cert":_conf.push_cert };
     }
 
     apnConnection = new apn.Connection(options);
