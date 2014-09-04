@@ -243,16 +243,16 @@ exports.run = function (c) {
     _conf.push_key = _safe(c.push_key,null);
     _conf.express = _safe(c.express, function (app) {});
     _conf.productionMode = _safe(c.productionMode,false);
-    if (_exists(_conf.cert) && _exists(_conf.key)) {
-      app = express.createServer({
-        'key': fs.readFileSync(_conf.key),
-        'cert': fs.readFileSync(_conf.cert),
-      });
-    } else {
-      app = express.createServer();
-    }
+    // if (_exists(_conf.cert) && _exists(_conf.key)) {
+    //   app = express.createServer({
+    //     'key': fs.readFileSync(_conf.key),
+    //     'cert': fs.readFileSync(_conf.cert),
+    //   });
+    // } else {
+    //   .createServer();
+    // }
 
-
+    app = express();
     // Install the body parser
     parse = express.bodyParser();
     app.use(parse);
@@ -284,9 +284,14 @@ exports.run = function (c) {
     try {
       _db = mongo.Db.connect.sync(mongo.Db, _conf.mongoURI, {});
 //       _db.User.ensureIndex({currentLocation:"2dsphere"});
-      app.listen(_conf.port, function appListen() {
-        console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
-      });
+      // app.listen(_conf.port, function appListen() {
+      //   console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
+      // });
+
+    https.createServer({
+        'key': fs.readFileSync(_conf.key),
+        'cert': fs.readFileSync(_conf.cert),
+      }, app).listen(443);
     } catch (e) {
       console.error(e);
     }
