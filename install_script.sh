@@ -16,5 +16,6 @@ git checkout v0.10.24
 ./configure
 make
 sudo make install
+sudo npm install pm2@latest -g --unsafe-perm
 
 
