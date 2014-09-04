@@ -1,5 +1,5 @@
 #!/bin/bash
 
-pm2 startup ubuntu
-pm2 start processes.json
-pm2 save
+sudo pm2 startup ubuntu
+sudo pm2 start processes.json
+sudo pm2 save
