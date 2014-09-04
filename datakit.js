@@ -12,6 +12,7 @@
  */
 
 var express = require('express');
+var https = require('https')
 var assert = require('assert');
 var mongo = require('mongodb');
 var crypto = require('crypto');
@@ -242,16 +243,8 @@ exports.run = function (c) {
     _conf.push_key = _safe(c.push_key,null);
     _conf.express = _safe(c.express, function (app) {});
     _conf.productionMode = _safe(c.productionMode,false);
-    if (_exists(_conf.cert) && _exists(_conf.key)) {
-      app = express.createServer({
-        'key': fs.readFileSync(_conf.key),
-        'cert': fs.readFileSync(_conf.cert),
-      });
-    } else {
-      app = express.createServer();
-    }
-
-
+    app = express();
+    
     // Install the body parser
     parse = express.bodyParser();
     app.use(parse);
@@ -282,8 +275,10 @@ exports.run = function (c) {
     // Connect to DB and run
     try {
       _db = mongo.Db.connect.sync(mongo.Db, _conf.mongoURI, {});
-//       _db.User.ensureIndex({currentLocation:"2dsphere"});
-      app.listen(_conf.port, function appListen() {
+      https.createServer({
+        'key': fs.readFileSync(_conf.key),
+        'cert': fs.readFileSync(_conf.cert),
+      },app).listen(_conf.port, function(){
         console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
       });
     } catch (e) {
