@@ -8,6 +8,13 @@ sudo apt-get -y install mongodb-org
 sudo service mongod restart
 
 #install pm2
-
+sudo apt-get install build-essential
+sudo apt-get install curl openssl libssl-dev
+git clone https://github.com/joyent/node.git
+cd node
+git checkout v0.10.24
+./configure
+make
+sudo make install
 
 
