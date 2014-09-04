@@ -1,0 +1,15 @@
+{
+  "apps" : [{
+    "name"       : "Grid API",
+    "script"     : "./run.js",
+    "instances"  : "max",
+    "log_date_format"  : "YYYY-MM-DD",
+    "watch"       : "true",
+    "error_file" : "./log/error.log",
+    "out_file"   : "./log/out.log",
+    "pid_file"   : "./log/Grid.pid",
+    "exec_mode"  : "cluster_mode",
+    "port"       : 80
+  }
+  ]
+}
