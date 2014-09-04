@@ -9,6 +9,10 @@ if [ ! -f ssl/key.cem || ! -f ssl/cert.cem]; then
 	cd ..
 fi
 
+if [ ! -f log ]; then
+	mkdir log
+fi
+
 sudo pm2 startup ubuntu
 sudo pm2 start processes.json
 sudo pm2 save
