@@ -5,7 +5,7 @@
     "instances"  : "max",
     "watch"       : "true",
     "exec_mode"  : "cluster_mode",
-    "port"       : 80
+    "port"       : 8000
   }
   ]
 }
