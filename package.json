@@ -13,6 +13,7 @@
     "mongodb": "1.4.10",
     "sync": "v0.2.3",
     "node-uuid": "1.4.1",
+    "body-parser":"1.7.0",
     "apn":"1.6.1"
   },
   "files": [

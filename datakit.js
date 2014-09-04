@@ -12,6 +12,7 @@
  */
 
 var express = require('express');
+var bodyParser = require('body-parser')
 var https = require('https')
 var assert = require('assert');
 var mongo = require('mongodb');
@@ -243,19 +244,21 @@ exports.run = function (c) {
     _conf.push_key = _safe(c.push_key,null);
     _conf.express = _safe(c.express, function (app) {});
     _conf.productionMode = _safe(c.productionMode,false);
-    // if (_exists(_conf.cert) && _exists(_conf.key)) {
-    //   app = express.createServer({
-    //     'key': fs.readFileSync(_conf.key),
-    //     'cert': fs.readFileSync(_conf.cert),
-    //   });
-    // } else {
-    //   .createServer();
-    // }
+    if (_exists(_conf.cert) && _exists(_conf.key)) {
+      // app = express.createServer({
+      //   'key': fs.readFileSync(_conf.key),
+      //   'cert': fs.readFileSync(_conf.cert),
+      // });
+    } else {
+      // .createServer();
+    }
 
     app = express();
+
     // Install the body parser
-    parse = express.bodyParser();
-    app.use(parse);
+
+    app.use(bodyParser.json());
+    console.log("exists");
 
     if (_conf.secret === null) {
       buf = crypto.randomBytes.sync(crypto, 32);
@@ -291,7 +294,8 @@ exports.run = function (c) {
     https.createServer({
         'key': fs.readFileSync(_conf.key),
         'cert': fs.readFileSync(_conf.cert),
-      }, app).listen(443);
+      }, app).listen(_conf.port);
+    console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
     } catch (e) {
       console.error(e);
     }
