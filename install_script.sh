@@ -11,5 +11,5 @@ sudo service mongod restart
 sudo apt-get -y install nodejs
 sudo apt-get -y install npm
 npm install
-npm install pm2@latest -g
+npm install pm2
 
