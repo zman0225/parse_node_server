@@ -8,8 +8,6 @@ sudo apt-get -y install mongodb-org
 sudo service mongod restart
 
 #install pm2
-sudo apt-get -y install nodejs
-sudo apt-get -y install npm
-npm install
-npm install pm2
+
+
 
