@@ -258,7 +258,6 @@ exports.run = function (c) {
     // Install the body parser
 
     app.use(bodyParser.json());
-    console.log("exists");
 
     if (_conf.secret === null) {
       buf = crypto.randomBytes.sync(crypto, 32);
@@ -287,15 +286,15 @@ exports.run = function (c) {
     try {
       _db = mongo.Db.connect.sync(mongo.Db, _conf.mongoURI, {});
 //       _db.User.ensureIndex({currentLocation:"2dsphere"});
-      // app.listen(_conf.port, function appListen() {
-      //   console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
-      // });
+      app.listen(_conf.port, function appListen() {
+        console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
+      });
 
-    https.createServer({
-        'key': fs.readFileSync(_conf.key),
-        'cert': fs.readFileSync(_conf.cert),
-      }, app).listen(_conf.port);
-    console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
+    // https.createServer({
+    //     'key': fs.readFileSync(_conf.key),
+    //     'cert': fs.readFileSync(_conf.cert),
+    //   }, app).listen(_conf.port);
+    // console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
     } catch (e) {
       console.error(e);
     }
