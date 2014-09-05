@@ -289,12 +289,19 @@ exports.run = function (c) {
       // app.listen(_conf.port, function appListen() {
       //   console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
       // });
-
-    https.createServer({
+    if(_exists(conf.key)&&_exists(conf.cert)){
+      https.createServer({
         'key': fs.readFileSync(_conf.key),
         'cert': fs.readFileSync(_conf.cert),
       }, app).listen(_conf.port);
-    console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
+          console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
+
+    }else{
+      app.listen(_conf.port, function appListen() {
+        console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
+      });
+    }
+    
     } catch (e) {
       console.error(e);
     }
