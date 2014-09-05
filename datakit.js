@@ -56,7 +56,7 @@ var _secureMethod = function (m) {
       return _m(m)(req, res);
     }
     res.header('WWW-Authenticate', 'datakit-secret');
-    res.send(401);
+    res.status(401).send('');
   };
 };
 var _mkdirs = function (dirs, mode, cb) {
@@ -187,7 +187,7 @@ var _streamFileFromGridFS = function (req, res, fn) {
     var gs, stream;
     if (!fn) {
       // HTTP: Not Found
-      return res.send('', 404);
+      return res.status(404).send('');
     }
 
     // Open grid store
@@ -197,7 +197,7 @@ var _streamFileFromGridFS = function (req, res, fn) {
     } catch (e) {
       console.log(e);
       // HTTP: Server Error
-      return res.send('', 500);
+      return res.status(500).send('');
     }
 
     // Write head
@@ -337,14 +337,14 @@ exports.run = function (c) {
   });
 };
 exports.info = function (req, res) {
-  res.send('datakit', 200);
+  res.status(200).send('datakit');
 };
 exports.getPublishedObject = function (req, res) {
   doSync(function publicSync() {
     var key, col, result, oid, fields;
     key = req.param('key', null);
     if (!_exists(key)) {
-      return res.send(404);
+       return res.status(404).send('');
     }
     try {
       col = _db.collection.sync(_db, _DKDB.PUBLIC_OBJECTS);
@@ -362,7 +362,7 @@ exports.getPublishedObject = function (req, res) {
         if (fields.length === 1) {
                 		  console.log("index output is "+result[fields[0]]);
 
-          return res.send(result[fields[0]], 200);
+          return   res.status(200).send(result[fields[0]]);
         } else {
         		  console.log("index output is "+results);
 
@@ -373,7 +373,7 @@ exports.getPublishedObject = function (req, res) {
       console.error(e);
     }
 
-    return res.send(404);
+    return res.status(404).send('');
   });
 };
 exports.publishObject = function (req, res) {
@@ -614,9 +614,7 @@ exports.deleteObject = function (req, res) {
       collection = _db.collection.sync(_db, entity);
       result = collection.remove.sync(collection, {'_id': oid}, {'safe': true});
       		      // _print("delete","deleted");
-
-
-      res.send('', 200);
+      res.status(200).send('');
     } catch (e) {
       console.error(e);
       return _e(res, _ERR.OPERATION_FAILED, e);
@@ -823,8 +821,7 @@ exports.index = function (req, res) {
       collection = _db.collection.sync(_db, entity);
       cursor = collection.ensureIndex.sync(collection, {key: 1}, opts);
       _print("index","indexed");
-
-      return res.send('', 200);
+      return res.status(200).send('');
     } catch (e) {
       return _e(res, _ERR.OPERATION_FAILED, e);
     }
@@ -843,9 +840,8 @@ exports.destroy = function (req, res) {
     try {
       collection = _db.collection.sync(_db, entity);
       collection.drop.sync(collection);
-      _print("drop","dropped");
-
-      return res.send('', 200);
+      // _print("drop","dropped");
+      return res.status(200).send('');
     } catch (e) {
       return _e(res, _ERR.OPERATION_FAILED, e);
     }
@@ -857,7 +853,7 @@ exports.drop = function (req, res) {
       try {
         _db.dropDatabase.sync(_db);
         console.log("dropped database", _db.databaseName);
-        res.send('', 200);
+          res.status(200).send('');
       } catch (e) {
         console.error(e);
         _e(res, _ERR.OPERATION_FAILED, e);
@@ -897,7 +893,7 @@ exports.store = function (req, res) {
               console.log("connection closed, unlink file");
               // Remove the file if stream was closed prematurely
               mongo.GridStore.unlink(_db, fileName, function (err) {
-                res.send('', 400);
+                res.status(400).send('');
               });
             } else if (onEnd) {
               res.writeHead(200, {
@@ -982,7 +978,7 @@ exports.unlink = function (req, res) {
     }
     		console.log("unlinked ");
 
-    return res.send('', 200);
+    return res.status(200).send('');
   });
 };
 exports.stream = function (req, res) {
@@ -999,7 +995,7 @@ exports.exists = function (req, res) {
       try {
         exists = gs.exist.sync(gs, _db, fileName);
         if (exists) {
-          return res.send('', 200);
+          return res.status(200).send('');
         }
       } catch (e) {
         console.error(e);
