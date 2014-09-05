@@ -13,6 +13,14 @@ if [ ! -f log ]; then
 	mkdir log
 fi
 
+sudo rm -rf node_modules
+sudo npm cache clean
+sudo npm install
+sudo npm update
+
 sudo pm2 startup ubuntu
 sudo pm2 start processes.json
+sleep 1
 sudo pm2 save
+
+sudo pm2-web --pm2.host foo.baz.com
