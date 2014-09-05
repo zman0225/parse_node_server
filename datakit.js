@@ -345,7 +345,7 @@ exports.run = function (c) {
   });
 };
 exports.info = function (req, res) {
-  res.status(200).send('datakit');
+  res.status(200).send('<h1>Welcome to Grid API.</h1><h4>Developer APIs coming soon!</h4>');
 };
 exports.getPublishedObject = function (req, res) {
   doSync(function publicSync() {

@@ -8,6 +8,7 @@ require("./datakit").run({
   'allowDestroy': true,
   'allowDrop': true,
   'productionMode':false,
+  'mongoURI':'mongodb://localhost:27017/grid',
   'push_key':"./push_development_ssl/key.pem",
   'push_cert':"./push_development_ssl/cert.pem",
    // 'push_key':"./push_production_ssl/key.pem",
