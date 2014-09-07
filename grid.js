@@ -467,7 +467,7 @@ exports.saveObject = function (req, res) {
         try {
           ts = parseInt((new Date().getTime()) / 1000, 10);
           collection = _db.collection.sync(_db, entity);
-          isNew = (oid === null);
+          isNew = (_exists(oid));
 
           // Automatically insert the update timestamp
           fset._updated = ts;
@@ -871,7 +871,7 @@ exports.store = function (req, res) {
     fileName = req.header('x-datakit-filename', null);
 
     // Generate filename if neccessary, else check for conflict
-    if (fileName === null||!_def(fileName)) {
+    if (!_exists(fileName)) {
       fileName = uuid.v4();
     }
     console.log("storing file",fileName);
