@@ -653,6 +653,8 @@ exports.query = function (req, res) {
     if (!_exists(entity)) {
       return _e(res, _ERR.INVALID_PARAMS);
     }
+
+    try{
     doFindOne = req.param('findOne', false);
     doCount = req.param('count', false);
     query = req.param('q', {});
@@ -665,7 +667,7 @@ exports.query = function (req, res) {
     skip = req.param('skip', null);
     limit = req.param('limit', null);
     mr = req.param('mr', null);
-    console.log("querying for ",query);
+    console.log("querying for ",entity,query);
     if (_exists(or)) {
       query.$or = or;
       console.log("or exists!")
@@ -697,6 +699,10 @@ exports.query = function (req, res) {
         this[key] = new mongo.ObjectID(value);
       }
     });
+  }catch(e){
+
+    console.error("error",e);
+  }
 
     try {
       collection = _db.collection.sync(_db, entity);
@@ -776,7 +782,7 @@ exports.query = function (req, res) {
     console.log("query results completed",results);    
       return res.json(results, 200);
     } catch (e) {
-      console.error(e);
+      console.error("ERROR",e);
       return _e(res, _ERR.OPERATION_FAILED, e);
     }
   });
