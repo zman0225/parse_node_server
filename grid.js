@@ -695,6 +695,8 @@ try{
     // replace oid strings with oid objects
     _traverse(query, function (key, value) {
       if (key === '_id') {
+        console.error("=value",key,value);
+
         if(value.hasOwnProperty("$in")){
           for(i in value['$in']){
             console.error("value",value['$in'][i]);
