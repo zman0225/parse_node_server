@@ -701,7 +701,7 @@ exports.query = function (req, res) {
     });
   }catch(e){
 
-    console.error("error",e);
+    console.error("hit error",e);
   }
 
     try {
