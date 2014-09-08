@@ -162,7 +162,11 @@ var _encodeDkObj = function (o) {
 var _generateNextSequenceNumber = function (entity) {
   var col, doc;
   col = _db.collection.sync(_db, _DKDB.SEQENCE);
-  col.insert.sync(col, {'_id': entity, 'seq': new mongo.Long(0)});
+  var cursor = col.find.sync(collection,{'_id': entity});
+  var tokens = cursor.toArray.sync(cursor);
+  if (_exists(tokens)&&tokens.length==0){
+      col.insert.sync(col, {'_id': entity, 'seq': new mongo.Long(0)});
+  }
   doc = col.findAndModify.sync(
     col,
     {'_id': entity},
