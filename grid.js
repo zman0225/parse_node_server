@@ -654,7 +654,6 @@ exports.query = function (req, res) {
       return _e(res, _ERR.INVALID_PARAMS);
     }
 
-    try{
     doFindOne = req.param('findOne', false);
     doCount = req.param('count', false);
     query = req.param('q', {});
@@ -692,17 +691,18 @@ exports.query = function (req, res) {
     if (_exists(limit)) {
       opts.limit = parseInt(limit, 10);
     }
-}catch(e){
-
-    console.error("hit error",e);
-  }
+try{
     // replace oid strings with oid objects
     _traverse(query, function (key, value) {
       if (key === '_id') {
+        console.error("value",key,value);
         this[key] = new mongo.ObjectID(value);
       }
     });
-  
+  }catch(e){
+
+    console.error("hit error",e);
+  }
 
     try {
       collection = _db.collection.sync(_db, entity);
