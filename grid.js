@@ -696,7 +696,7 @@ try{
     _traverse(query, function (key, value) {
       if (key === '_id') {
         if(value.hasOwnProperty("$in")){
-          for(i in value['$in']{
+          for(i in value['$in']){
             console.error("value",value['$in'][i]);
             value['$in'][i] = new mongo.ObjectID(value['$in'][i]);
           }
