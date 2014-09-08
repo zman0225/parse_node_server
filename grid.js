@@ -250,7 +250,7 @@ exports.run = function (c) {
 
     // Install the body parser
 
-    app.use(bodyParser.json());
+    app.use(bodyParser.json({type:'application/json'}));
 
     if (_conf.secret === null) {
       buf = crypto.randomBytes.sync(crypto, 32);
@@ -695,8 +695,15 @@ try{
     // replace oid strings with oid objects
     _traverse(query, function (key, value) {
       if (key === '_id') {
-        console.error("value",key,value);
-        this[key] = new mongo.ObjectID(value);
+        if(value.hasOwnProperty("$in")){
+          for(i in value['$in']{
+            console.error("value",value['$in'][i]);
+            value['$in'][i] = new mongo.ObjectID(value['$in'][i]);
+          }
+        }else{
+          console.error("value",key,value);
+          this[key] = new mongo.ObjectID(value);
+        }
       }
     });
   }catch(e){
