@@ -666,7 +666,7 @@ exports.query = function (req, res) {
     skip = req.param('skip', null);
     limit = req.param('limit', null);
     mr = req.param('mr', null);
-    console.log("querying for ",entity,query);
+    console.log("querying for ",entity,fieldInclExcl,refIncl,query);
     if (_exists(or)) {
       query.$or = or;
       console.log("or exists!")
