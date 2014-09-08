@@ -6,8 +6,8 @@
  * Copyright (c) 2012, Erik Aigner. All rights reserved.
  * 
  * Use of this software is only permitted in conjunction with the
- * DataKit iOS and Mac frameworks and implies conformance to the
- * DataKit frameworks' license terms.
+ * grid iOS and Mac frameworks and implies conformance to the
+ * grid frameworks' license terms.
  *
  */
 
@@ -27,15 +27,7 @@ var apnConnection = {};
 // private functions
 var _conf = {};
 var _db = {};
-var _print = function(x,v){
-var pad = '-'.repeat(80);
-	console.log(pad);
-	console.log(x);
-	console.log(pad);
-	console.log(v);
-		console.log(pad);
-console.log('\n');
-}
+
 var _def = function (v) {
   return (typeof v !== 'undefined');
 };
@@ -50,12 +42,12 @@ var _m = function (m) {
 };
 var _secureMethod = function (m) {
   return function (req, res) {
-    var s = req.header('x-datakit-secret', null);
+    var s = req.header('x-grid-secret', null);
     if (_exists(s) && s === _conf.secret) {
       return _m(m)(req, res);
     }
-    res.header('WWW-Authenticate', 'datakit-secret');
-    return res.status(401).send('');
+    res.header('WWW-Authenticate', 'grid-secret');
+    res.status(401).send('');
   };
 };
 var _mkdirs = function (dirs, mode, cb) {
@@ -111,7 +103,7 @@ var _e = function (res, snm, err) {
     //   console.error("error returned at", l);
     // });
   }
-  return res.status(400).json(eo);
+  return res.json(eo, 400);
 };
 var _c = {
   red: '\u001b[31m',
@@ -122,8 +114,8 @@ var _c = {
   reset: '\u001b[0m'
 };
 var _DKDB = {
-  PUBLIC_OBJECTS: 'datakit.pub',
-  SEQENCE: 'datakit.seq'
+  PUBLIC_OBJECTS: 'grid.pub',
+  SEQENCE: 'grid.seq'
 };
 var _ERR = {
   INVALID_PARAMS: [100, 'Invalid parameters'],
@@ -178,8 +170,8 @@ var _generateNextSequenceNumber = function (entity) {
     {'$inc': {'seq': 1}},
     {'new': true}
   );
-
-  return doc.seq;
+  console.log("is new generating new sequence number",doc[0].seq);
+  return doc[0].seq;
 };
 var _streamFileFromGridFS = function (req, res, fn) {
   doSync(function streamFileSync() {
@@ -229,13 +221,12 @@ exports.run = function (c) {
     var pad, nl, buf, srv, db, parse;
     pad = '-'.repeat(80);
     nl = '\n';
-    console.log(nl + pad + nl + 'DATAKIT' + nl + pad);
-    _conf.mongoURI = _safe(c.mongoURI, 'mongodb://localhost:27017/datakit');
+    console.log(nl + pad + nl + 'grid' + nl + pad);
+    _conf.mongoURI = _safe(c.mongoURI, 'mongodb://localhost:27017/grid');
     _conf.path = _safe(c.path, '');
-    _conf.developmentPort = _safe(c.developmentPort, process.env.PORT || 8000);
     _conf.port = _safe(c.port, process.env.PORT || 8000);
     _conf.secret = _safe(c.secret, null);
-    _conf.salt = _safe(c.salt, "datakit");
+    _conf.salt = _safe(c.salt, "grid");
     _conf.allowDestroy = _safe(c.allowDestroy, false);
     _conf.allowDrop = _safe(c.allowDrop, false);
     _conf.cert = _safe(c.cert, null);
@@ -244,8 +235,14 @@ exports.run = function (c) {
     _conf.push_key = _safe(c.push_key,null);
     _conf.express = _safe(c.express, function (app) {});
     _conf.productionMode = _safe(c.productionMode,false);
-
-
+    if (_exists(_conf.cert) && _exists(_conf.key)) {
+      // app = express.createServer({
+      //   'key': fs.readFileSync(_conf.key),
+      //   'cert': fs.readFileSync(_conf.cert),
+      // });
+    } else {
+      // .createServer();
+    }
 
     app = express();
 
@@ -257,7 +254,7 @@ exports.run = function (c) {
       buf = crypto.randomBytes.sync(crypto, 32);
       _conf.secret = buf.toString('hex');
       console.log(_c.red + 'WARN:\tNo secret found in config, generated new one.\n',
-                  '\tCopy this secret to your DataKit iOS app and server config!\n\n',
+                  '\tCopy this secret to your grid iOS app and server config!\n\n',
                   _c.yellow,
                   '\t' + _conf.secret, nl, nl,
                   _c.red,
@@ -279,29 +276,16 @@ exports.run = function (c) {
     // Connect to DB and run
     try {
       _db = mongo.Db.connect.sync(mongo.Db, _conf.mongoURI, {});
+//       _db.User.ensureIndex({currentLocation:"2dsphere"});
+      app.listen(_conf.port, function appListen() {
+        console.log(_c.green + 'grid started on port', _conf.port, _c.reset);
+      });
 
-
-      // collection.ensureIndex({"currentLocation":"2dsphere"});
-      // collection.ensureIndex({"Location":"2dsphere"});
-      // app.listen(_conf.port, function appListen() {
-      //   console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
-      // });
-    // if(_exists(conf.key)&&_exists(conf.cert)){
-    //   https.createServer({
+    // https.createServer({
     //     'key': fs.readFileSync(_conf.key),
     //     'cert': fs.readFileSync(_conf.cert),
     //   }, app).listen(_conf.port);
-    //       console.log(_c.green + 'DataKit started on port', _conf.port, _c.reset);
-
-    // }else{
-      
-    // }
-
-    var portToUse = _conf.productionMode?_conf.port:_conf.developmentPort;
-    app.listen(portToUse, function appListen() {
-        console.log(_c.green + 'DataKit started on port', portToUse, _c.reset);
-      });
-    
+    // console.log(_c.green + 'grid started on port', _conf.port, _c.reset);
     } catch (e) {
       console.error(e);
     }
@@ -344,7 +328,7 @@ exports.run = function (c) {
   });
 };
 exports.info = function (req, res) {
-  return res.status(200).send('<h1>Welcome to Grid API.</h1><h4>Developer APIs coming soon!</h4>');
+  res.status(200).send('grid');
 };
 exports.getPublishedObject = function (req, res) {
   doSync(function publicSync() {
@@ -367,13 +351,13 @@ exports.getPublishedObject = function (req, res) {
         result = col.findOne.sync(col, {'_id': oid}, fields);
 
         if (fields.length === 1) {
-                		  console.log("index output is "+result[fields[0]]);
+                      console.log("index output is "+result[fields[0]]);
 
           return   res.status(200).send(result[fields[0]]);
         } else {
-        		  console.log("index output is "+results);
+              console.log("index output is "+results);
 
-          return res.status(200).json(result);
+          return res.json(result, 200);
         }
       }
     } catch (e) {
@@ -419,8 +403,8 @@ exports.publishObject = function (req, res) {
       q = isFile ? fn : query;
       col = _db.collection.sync(_db, _DKDB.PUBLIC_OBJECTS);
       col.update.sync(col, {'_id': key}, {'$set': {'q': q, 'isFile': isFile}}, {'safe': true, 'upsert': true});
-		console.log("publishObject output is ",key);
-      return res.status(200).json({'key':key}); 
+      console.log("publishObject output is "+key);
+      return res.json({'key': key}, 200);
     } catch (e) {
       console.error(e);
       return _e(res, _ERR.OPERATION_FAILED, e);
@@ -433,8 +417,8 @@ exports.saveObject = function (req, res) {
     entities = req.body;
     results = [];
     errors = [];
+    console.log("saveobject request",entities);
     for (i in entities) {
-      _print("entity",entities[i]);
       if (entities.hasOwnProperty(i)) {
         ent = entities[i];
         entity = _safe(ent.entity, null);
@@ -467,17 +451,20 @@ exports.saveObject = function (req, res) {
         try {
           ts = parseInt((new Date().getTime()) / 1000, 10);
           collection = _db.collection.sync(_db, entity);
-          isNew = (_exists(oid));
+          isNew = (oid === null);
 
           // Automatically insert the update timestamp
           fset._updated = ts;
 
           // Insert new object
           if (isNew) {
+            console.log("is new generating seq");
             // Generate new sequence number         
             fset._seq = _generateNextSequenceNumber(entity);
             doc = collection.insert.sync(collection, fset);
             oid = doc[0]._id;
+          }else{
+            console.log("is not new",isNew,oid);
           }
 
           // Update instead if oid exists, or an operation needs to be executed
@@ -534,7 +521,7 @@ exports.saveObject = function (req, res) {
               for (var i = recipients.length - 1; i >= 0; i--) {
                 recipientsObjectId.push(new mongo.ObjectID(recipients[i]));
               };
-              _print("pushing notification to ",recipientsObjectId);
+              console.log("pushing notification to ",recipientsObjectId);
               collection = _db.collection.sync(_db, "User");
               var cursor = collection.find.sync(collection,{'_id':{$in:recipientsObjectId}},{'userDeviceTokens':1,_id:0});
               var tokens = cursor.toArray.sync(cursor);
@@ -572,7 +559,7 @@ exports.saveObject = function (req, res) {
                 }
               };
 
-              console.log("Tokens are "+tokensToDeliver);
+              console.log("Tokens are ",tokensToDeliver);
 
               var send = function(){   
                 setTimeout(
@@ -587,8 +574,6 @@ exports.saveObject = function (req, res) {
             });
           }
         } catch (e) {
-              console.log("saveObject error",e);
-
           errors.push(e);
         }
         
@@ -597,8 +582,9 @@ exports.saveObject = function (req, res) {
     if (errors.length > 0) {
       return _e(res, _ERR.OPERATION_FAILED, errors.pop());
     }
-    console.log("saveObject results",results);
-    return res.status(200).json(results);
+              console.log("savingObject request completed");
+
+    res.json(results, 200);
   });
 };
 exports.deleteObject = function (req, res) {
@@ -619,6 +605,7 @@ exports.deleteObject = function (req, res) {
     try {
       collection = _db.collection.sync(_db, entity);
       result = collection.remove.sync(collection, {'_id': oid}, {'safe': true});
+      console.log("delete request completed",entity);
       res.status(200).send('');
     } catch (e) {
       console.error(e);
@@ -649,8 +636,8 @@ exports.refreshObject = function (req, res) {
       }
 
       _encodeDkObj(result);
-      _print("refresh",result);
-      res.status(200).json(result);
+      console.log("refresh request completed",result);
+      res.json(result, 200);
     } catch (e) {
       console.error(e);
       return _e(res, _ERR.OPERATION_FAILED, e);
@@ -659,7 +646,6 @@ exports.refreshObject = function (req, res) {
 };
 exports.query = function (req, res) {
   doSync(function querySync() {
-  _print("query",JSON.stringify(req.body,null,4));
     var entity, doFindOne, doCount, query, opts, or, and, refIncl, fieldInclExcl, sort, skip, limit, mr, mrOpts, sortValues, order, results, cursor, collection, result, key, resultCount, i, j, field, dbRef, resolved;
     entity = req.param('entity', null);
     if (!_exists(entity)) {
@@ -677,12 +663,14 @@ exports.query = function (req, res) {
     skip = req.param('skip', null);
     limit = req.param('limit', null);
     mr = req.param('mr', null);
-
+    console.log("querying for ",query);
     if (_exists(or)) {
       query.$or = or;
+      console.log("or exists!")
     }
     if (_exists(and)) {
       query.$and = and;
+      console.log("and exists!")
     }
     if (_exists(sort)) {
       sortValues = [];
@@ -707,14 +695,8 @@ exports.query = function (req, res) {
         this[key] = new mongo.ObjectID(value);
       }
     });
-    _print("collection ent is",entity);
 
     try {
-      // console.log('query', entity, '=>',
-      //             JSON.stringify(query),
-      //             JSON.stringify(fieldInclExcl),
-      //             JSON.stringify(opts));
-
       collection = _db.collection.sync(_db, entity);
       if (mr !== null) {
         mrOpts = {
@@ -739,18 +721,15 @@ exports.query = function (req, res) {
           mr.reduce,
           mrOpts
         );
-        _print("query from map reduce",results)
       } else {
         if (doFindOne) {
           opts.limit = 1;
         }
-
         if (fieldInclExcl !== null) {
           cursor = collection.find.sync(collection, query, fieldInclExcl, opts);
         } else {
           cursor = collection.find.sync(collection, query, opts);
         }
-
         if (doCount) {
           results = cursor.count.sync(cursor);
         } else {
@@ -768,7 +747,7 @@ exports.query = function (req, res) {
                         'results, may impact server performance negatively. try to optimize the query!',
                         _c.reset);
           }
-
+      
           for (i in results) {
             if (results.hasOwnProperty(i)) {
               for (j in refIncl) {
@@ -790,10 +769,10 @@ exports.query = function (req, res) {
           }
         }
       }
+
       _encodeDkObj(results);
-      _print("query_results",results);
-	  
-      return res.status(200).json(results);
+    console.log("query results completed",results);    
+      return res.json(results, 200);
     } catch (e) {
       console.error(e);
       return _e(res, _ERR.OPERATION_FAILED, e);
@@ -807,11 +786,13 @@ exports.index = function (req, res) {
     key = req.param('key', null);
     unique = req.param('unique', false);
     drop = req.param('drop', false);
-
+console.log("ensureindex request completed", entity);
     if (!_exists(entity)) {
+      console.log("ensureindex request error", e);
       return _e(res, _ERR.INVALID_PARAMS);
     }
     if (!_exists(key)) {
+      console.log("ensureindex request error", e);
       return _e(res, _ERR.INVALID_PARAMS);
     }
     try {
@@ -823,7 +804,11 @@ exports.index = function (req, res) {
       collection = _db.collection.sync(_db, entity);
       cursor = collection.ensureIndex.sync(collection, {key: 1}, opts);
       return res.status(200).send('');
+          console.log("ensureindex request completed", entity);
+
     } catch (e) {
+          console.log("ensureindex request error", e);
+
       return _e(res, _ERR.OPERATION_FAILED, e);
     }
   });
@@ -854,7 +839,7 @@ exports.drop = function (req, res) {
       try {
         _db.dropDatabase.sync(_db);
         console.log("dropped database", _db.databaseName);
-          return res.status(200).send('');
+          res.status(200).send('');
       } catch (e) {
         console.error(e);
         _e(res, _ERR.OPERATION_FAILED, e);
@@ -868,14 +853,16 @@ exports.store = function (req, res) {
   doSync(function storeSync() {
     // Get filename and mode
     var fileName, store, bufs, onEnd, onClose, onCancel, isClosing, pendingWrites, tick, gs, exists;
-    fileName = req.header('x-datakit-filename', null);
-
-    // Generate filename if neccessary, else check for conflict
-    if (!_exists(fileName)) {
-      fileName = uuid.v4();
+    
+    // fileName = req.header('x-grid-filename', null);
+    // console.log("HIT");
+    // console.log(filename);
+    // // Generate filename if neccessary, else check for conflict
+    if (fileName === null||!_def(fileName)) {
+         fileName = uuid.v4();
+         console.log("file undefined so generating new number");
     }
     console.log("storing file",fileName);
-
     store = null;
     bufs = [];
     onEnd = false;
@@ -895,12 +882,11 @@ exports.store = function (req, res) {
               console.log("connection closed, unlink file");
               // Remove the file if stream was closed prematurely
               mongo.GridStore.unlink(_db, fileName, function (err) {
-                console.log("wtf");
-                return res.status(400).send('');
+                res.status(400).send('');
               });
             } else if (onEnd) {
               res.writeHead(200, {
-                'x-datakit-assigned-filename': fileName
+                'x-grid-assigned-filename': fileName
               });
               res.end();
             }
@@ -953,7 +939,7 @@ exports.store = function (req, res) {
     });
     gs.open(function (err, s) {
       if (err) {
-        console.log("ERROR:",err);
+        console.log(err);
         bufs = [];
         onCancel = true;
         return _e(res, _ERR.OPERATION_FAILED, err);
@@ -979,18 +965,17 @@ exports.unlink = function (req, res) {
     if (lastErr !== null) {
       return _e(res, _ERR.OPERATION_FAILED, lastErr);
     }
-    		console.log("unlinked ");
+        console.log("unlinked ");
 
     return res.status(200).send('');
   });
 };
-
 exports.stream = function (req, res) {
   doSync(function streamSync() {
-    _streamFileFromGridFS(req, res, req.header('x-datakit-filename', null));
+    console.log("streaming file",req.header('x-grid-filename', null));
+    _streamFileFromGridFS(req, res, req.header('x-grid-filename', null));
   });
 };
-
 exports.exists = function (req, res) {
   doSync(function existsSync() {
     var fileName, gs, exists;
@@ -1010,6 +995,3 @@ exports.exists = function (req, res) {
     return _e(res, _ERR.DUPLICATE_KEY);
   });
 };
-
-
-
