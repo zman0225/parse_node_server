@@ -12,7 +12,7 @@ require("./grid").run({
   'mongoURI':'mongodb://localhost:27017/grid',
   'push_key':"./push_development_ssl/key.pem",
   'push_cert':"./push_development_ssl/cert.pem",
-  'ca':'./ssl/api.grid.social.ca-bundle',
+  'ca':'./ssl/ca.ca-bundle',
   "key":"./ssl/server.key",
   "cert":"./ssl/server.crt"
    // 'push_key':"./push_production_ssl/key.pem",
