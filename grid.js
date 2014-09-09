@@ -309,8 +309,10 @@ exports.run = function (c) {
           'key': fs.readFileSync(_conf.key),
           'cert': fs.readFileSync(_conf.cert),
           'ca':ca
-        }, app).listen(_conf.port);
-        console.log(_c.green + 'grid started on port', _conf.port, _c.reset);
+        }, app).listen(_conf.port,function appListen(){
+                  console.log(_c.green + 'grid started on port', _conf.port, _c.reset);
+
+        });
       }
     
     } catch (e) {
