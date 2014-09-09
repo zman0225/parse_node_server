@@ -278,25 +278,26 @@ exports.run = function (c) {
     // Create API routes
     _createRoutes(_conf.path);
     _conf.express(app);
+    var ca, cert, chain, _i, _len, line;
+      try {
+        ca = [];
 
-    ca = [];
-
-    chain = fs.readFileSync(_conf.ca, 'utf8');
-    chain = chain.split("\n");
-    cert = [];
-    for (_i = 0, _len = chain.length; _i < _len; _i++) {
-      line = chain[_i];
-      if (!(line.length !== 0)) {
-        continue;
-      }
-      cert.push(line);
-      if (line.match(/-END CERTIFICATE-/)) {
-        ca.push(cert.join("\n"));
+        chain = fs.readFileSync(_conf.ca, 'utf8');
+        chain = chain.split("\n");
         cert = [];
-      }
-    }
-    // Connect to DB and run
-    try {
+        for (_i = 0, _len = chain.length; _i < _len; _i++) {
+          line = chain[_i];
+          if (!(line.length !== 0)) {
+            continue;
+          }
+          cert.push(line);
+          if (line.match(/-END CERTIFICATE-/)) {
+            ca.push(cert.join("\n"));
+            cert = [];
+          }
+        }
+        // Connect to DB and run
+   
       _db = mongo.Db.connect.sync(mongo.Db, _conf.mongoURI, {});
 
       if (!_def(_conf.ca)){
