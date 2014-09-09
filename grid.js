@@ -40,6 +40,7 @@ var _safe = function (v, d) {
 var _m = function (m) {
   return exports[m];
 };
+
 var _secureMethod = function (m) {
   return function (req, res) {
     var s = req.header('x-grid-secret', null);
@@ -121,7 +122,8 @@ var _ERR = {
   INVALID_PARAMS: [100, 'Invalid parameters'],
   OPERATION_FAILED: [101, 'Operation failed'],
   OPERATION_NOT_ALLOWED: [102, 'Operation not allowed'],
-  DUPLICATE_KEY: [103, 'Duplicate key']
+  DUPLICATE_KEY: [103, 'Duplicate key'],
+  INVALID_PASSWORD: [104, 'Password is invalid']
 };
 var _copyKeys = function (s, t) {
   var key;
@@ -227,6 +229,7 @@ exports.run = function (c) {
     _conf.mongoURI = _safe(c.mongoURI, 'mongodb://localhost:27017/grid');
     _conf.path = _safe(c.path, '');
     _conf.port = _safe(c.port, process.env.PORT || 8000);
+    _conf.developmentPort = _safe(c.developmentPort, process.env.PORT || 8000);
     _conf.secret = _safe(c.secret, null);
     _conf.salt = _safe(c.salt, "grid");
     _conf.allowDestroy = _safe(c.allowDestroy, false);
@@ -235,6 +238,7 @@ exports.run = function (c) {
     _conf.key = _safe(c.key, null);
     _conf.push_cert = _safe(c.push_cert,null);
     _conf.push_key = _safe(c.push_key,null);
+    _conf.ca = _safe(c.ca,null);
     _conf.express = _safe(c.express, function (app) {});
     _conf.productionMode = _safe(c.productionMode,false);
     if (_exists(_conf.cert) && _exists(_conf.key)) {
@@ -275,19 +279,39 @@ exports.run = function (c) {
     _createRoutes(_conf.path);
     _conf.express(app);
 
+    ca = [];
+
+    chain = fs.readFileSync(_conf.ca, 'utf8');
+    chain = chain.split("\n");
+    cert = [];
+    for (_i = 0, _len = chain.length; _i < _len; _i++) {
+      line = chain[_i];
+      if (!(line.length !== 0)) {
+        continue;
+      }
+      cert.push(line);
+      if (line.match(/-END CERTIFICATE-/)) {
+        ca.push(cert.join("\n"));
+        cert = [];
+      }
+    }
     // Connect to DB and run
     try {
       _db = mongo.Db.connect.sync(mongo.Db, _conf.mongoURI, {});
-//       _db.User.ensureIndex({currentLocation:"2dsphere"});
-      app.listen(_conf.port, function appListen() {
-        console.log(_c.green + 'grid started on port', _conf.port, _c.reset);
-      });
 
-    // https.createServer({
-    //     'key': fs.readFileSync(_conf.key),
-    //     'cert': fs.readFileSync(_conf.cert),
-    //   }, app).listen(_conf.port);
-    // console.log(_c.green + 'grid started on port', _conf.port, _c.reset);
+      if (!_def(_conf.ca)){
+        app.listen(_conf.developmentPort, function appListen() {
+          console.log(_c.green + 'grid started on port', _conf.developmentPort, _c.reset);
+        });
+      }else{
+        https.createServer({
+          'key': fs.readFileSync(_conf.key),
+          'cert': fs.readFileSync(_conf.cert),
+          'ca':ca
+        }, app).listen(_conf.port);
+        console.log(_c.green + 'grid started on port', _conf.port, _c.reset);
+      }
+    
     } catch (e) {
       console.error(e);
     }
@@ -443,6 +467,16 @@ exports.saveObject = function (req, res) {
         _decodeDkObj(fpushAll);
         _decodeDkObj(faddToSet);
         _decodeDkObj(fpullAll);
+
+        try{
+            _traverse(ent, function (key, value) {
+              if(key==='password'){
+                this[key] = crypto.pbkdf2Sync(value, _conf.salt, 100000, 64).toString('hex');
+              }
+            });
+          }catch(e){
+            console.error("_traverse password error",e);
+          }
 
         if (_exists(oidStr)) {
           oid = new mongo.ObjectID(oidStr);
@@ -691,27 +725,25 @@ exports.query = function (req, res) {
     if (_exists(limit)) {
       opts.limit = parseInt(limit, 10);
     }
-try{
-    // replace oid strings with oid objects
-    _traverse(query, function (key, value) {
-      if (key === '_id') {
-        console.error("=value",key,value);
 
-        if(value.hasOwnProperty("$in")){
-          for(i in value['$in']){
-            console.error("value",value['$in'][i]);
-            value['$in'][i] = new mongo.ObjectID(value['$in'][i]);
+    try{
+      _traverse(query, function (key, value) {
+        if (key === '_id') {
+          if(value.hasOwnProperty("$in")){
+            for(i in value['$in']){
+              value['$in'][i] = new mongo.ObjectID(value['$in'][i]);
+            }
+          }else{
+            this[key] = new mongo.ObjectID(value);
           }
-        }else{
-          console.error("value",key,value);
-          this[key] = new mongo.ObjectID(value);
+        }else if(key==='password'){
+          this[key] = crypto.pbkdf2Sync(value, _conf.salt, 100000, 64).toString('hex');
+          console.log("password detected",this[key]);
         }
-      }
-    });
-  }catch(e){
-
-    console.error("hit error",e);
-  }
+      });
+    }catch(e){
+      console.error("_traverse error",e);
+    }
 
     try {
       collection = _db.collection.sync(_db, entity);
@@ -779,6 +811,7 @@ try{
                     }
                   } catch (refErr) {
                     // stub, could not resolve reference
+                    console.error("ERROR: ",refErr)
                   }
                 }
               }
@@ -786,9 +819,8 @@ try{
           }
         }
       }
-
       _encodeDkObj(results);
-    console.log("query results completed",results);    
+      console.log("query results completed");    
       return res.json(results, 200);
     } catch (e) {
       console.error("ERROR",e);
@@ -824,7 +856,7 @@ console.log("ensureindex request completed", entity);
           console.log("ensureindex request completed", entity);
 
     } catch (e) {
-          console.log("ensureindex request error", e);
+          console.error("ensureindex request error", e);
 
       return _e(res, _ERR.OPERATION_FAILED, e);
     }
