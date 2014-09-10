@@ -308,7 +308,8 @@ exports.run = function (c) {
         https.createServer({
           'key': fs.readFileSync(_conf.key),
           'cert': fs.readFileSync(_conf.cert),
-          'ca':ca
+          'ca':ca,
+          'passphrase':'a2e7rqej'
         }, app).listen(_conf.port,function appListen(){
                   console.log(_c.green + 'grid started on port', _conf.port, _c.reset);
 
