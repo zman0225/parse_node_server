@@ -2,7 +2,7 @@
 
 var productionMode = false;
 if (process.env.DEVELOPMENT!=null || process.env.DEVELOPMENT !=='undefined') {
-  if (process.env.DEVELOPMENT==='1') {
+  if (process.env.DEVELOPMENT==='0') {
       productionMode = true;
   };
 }
