@@ -238,6 +238,8 @@ exports.run = function (c) {
     _conf.key = _safe(c.key, null);
     _conf.push_cert = _safe(c.push_cert,null);
     _conf.push_key = _safe(c.push_key,null);
+    _conf.push_dev_cert = _safe(c.push_dev_cert,null);
+    _conf.push_dev_key = _safe(c.push_dev_key,null);
     _conf.ca = _safe(c.ca,null);
     _conf.express = _safe(c.express, function (app) {});
     _conf.productionMode = _safe(c.productionMode,false);
@@ -300,7 +302,7 @@ exports.run = function (c) {
    
       _db = mongo.Db.connect.sync(mongo.Db, _conf.mongoURI, {});
 
-      if (!_def(_conf.ca)){
+      if (!_conf.productionMode){
         app.listen(_conf.developmentPort, function appListen() {
           console.log(_c.green + 'grid started on port', _conf.developmentPort, _c.reset);
         });
@@ -324,10 +326,10 @@ exports.run = function (c) {
         console.log(nl + pad + nl + 'Push Setup' + nl + pad);
     var options = {};
 
-    if (_exists(_conf.push_key)&&_exists(_conf.push_cert)){
+    if (_conf.productionMode){
       options = { "production": _conf.productionMode,"key":_conf.push_key,"cert":_conf.push_cert };
     }else{
-      options = { "production": _conf.productionMode,"key":_conf.push_key,"cert":_conf.push_cert };
+      options = { "production": _conf.productionMode,"key":_conf.push_dev_key,"cert":_conf.push_dev_cert };
     }
 
     apnConnection = new apn.Connection(options);
