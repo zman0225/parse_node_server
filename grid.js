@@ -39,6 +39,7 @@ process.on('message', function(msg) {
     // You will have 4000ms to close all connections before
     // the reload mechanism will try to do its job
     _db.close();
+    https.close();
 
     setTimeout(function() {
       console.log('Finished closing connections');
