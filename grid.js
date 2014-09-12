@@ -241,6 +241,7 @@ exports.run = function (c) {
     _conf.push_dev_cert = _safe(c.push_dev_cert,null);
     _conf.push_dev_key = _safe(c.push_dev_key,null);
     _conf.ca = _safe(c.ca,null);
+    _conf.push_ca = _safe(c.push_ca,null);
     _conf.express = _safe(c.express, function (app) {});
     _conf.productionMode = _safe(c.productionMode,false);
     if (_exists(_conf.cert) && _exists(_conf.key)) {
@@ -327,7 +328,7 @@ exports.run = function (c) {
     var options = {};
 
     if (_conf.productionMode){
-      options = { "production": _conf.productionMode,"key":_conf.push_key,"cert":_conf.push_cert };
+      options = { "production": _conf.productionMode,"key":_conf.push_key,"cert":_conf.push_cert, "ca":_conf.push_ca };
     }else{
       options = { "production": _conf.productionMode,"key":_conf.push_dev_key,"cert":_conf.push_dev_cert };
     }
