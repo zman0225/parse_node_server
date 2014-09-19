@@ -326,10 +326,12 @@ exports.run = function (c) {
       _db = mongo.Db.connect.sync(mongo.Db, _conf.mongoURI, {});
 
       if (!_conf.productionMode){
+        console.log("trying port",_conf.developmentPort);
         app.listen(_conf.developmentPort, function appListen() {
           console.log(_c.green + 'grid started on port', _conf.developmentPort, _c.reset);
         });
       }else{
+                console.log("trying port",_conf.port);
         https.createServer({
           'key': fs.readFileSync(_conf.key),
           'cert': fs.readFileSync(_conf.cert),
@@ -367,18 +369,18 @@ exports.run = function (c) {
     });
 
     //setup feedback
-    var options = {
-        "batchFeedback": true,
-        "interval": 300
-    };
+    // var options = {
+    //     "batchFeedback": true,
+    //     "interval": 300
+    // };
 
-    var feedback = new apn.Feedback(options);
-    feedback.on("feedback", function(devices) {
-        devices.forEach(function(item) {
-            // Do something with item.device and item.time;
-            console.log("failed to deliver to device "+item.device+" at time: "+item.time);
-        });
-    });
+    // var feedback = new apn.Feedback(options);
+    // feedback.on("feedback", function(devices) {
+    //     devices.forEach(function(item) {
+    //         // Do something with item.device and item.time;
+    //         console.log("failed to deliver to device "+item.device+" at time: "+item.time);
+    //     });
+    // });
 
   });
 };
@@ -940,7 +942,6 @@ exports.store = function (req, res) {
          fileName = uuid.v4();
          console.log("file undefined so generating new number");
     }
-    console.log("storing file",fileName);
     store = null;
     bufs = [];
     onEnd = false;
@@ -986,10 +987,13 @@ exports.store = function (req, res) {
 
     // Register handlers
     req.on('end', function () {
+            console.log("ending");
+
       onEnd = true;
       tick(null);
     });
     req.on('close', function () {
+      console.log("closing");
       onClose = true;
       tick(null);
     });
@@ -1007,6 +1011,7 @@ exports.store = function (req, res) {
       console.error(e);
       return _e(res, _ERR.OPERATION_FAILED, e);
     }
+    console.log("storing ",fileName);
 
     // Pipe to GridFS
     gs = new mongo.GridStore(_db, fileName, 'w+', {

@@ -1,18 +1,7 @@
 "use strict";
 
-var productionMode = false;
-if (process.env.DEVELOPMENT !==' undefined') {
-          console.log("var is ",process.env.DEVELOPMENT);
-
-  if (process.env.DEVELOPMENT===0) {
-      productionMode = false;
-  }else{
-      productionMode = true;
-  };
-}else{
-  productionMode = true;
-}
-        console.log("mode is ",productionMode);
+var productionMode = (process.env.DEVELOPMENT==='undefined');
+console.log("mode is ",process.env.DEVELOPMENT);
 
 require("./grid").run({
   "developmentPort":8000,
