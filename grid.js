@@ -659,6 +659,7 @@ exports.deleteObject = function (req, res) {
     var entity, oidStr, oid, collection, result;
     entity = req.param('entity', null);
     oidStr = req.param('oid', null);
+    console.log("entity to delete",entity,oidStr);
     if (!_exists(entity)) {
       return _e(res, _ERR.INVALID_PARAMS);
     }
@@ -851,8 +852,10 @@ exports.query = function (req, res) {
         }
       }
       _encodeDkObj(results);
-      console.log("query results completed");    
-      return res.json(results, 200);
+      console.log("query results completed");  
+      res.set('Cache-Control', 'public, max-age=3000');
+      res.set("Expires", new Date(Date.now() + 3000000).toUTCString());
+      return res.status(200).json(results);
     } catch (e) {
       console.error("ERROR",e);
       return _e(res, _ERR.OPERATION_FAILED, e);
@@ -1036,6 +1039,7 @@ exports.unlink = function (req, res) {
   doSync(function unlinkSync() {
     var files, i, gs, lastErr;
     files = req.param('files', []);
+    console.log("files to unlink",files);
     gs = mongo.GridStore;
     lastErr = null;
     for (i = 0; i < files.length; i += 1) {
