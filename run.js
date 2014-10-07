@@ -1,6 +1,6 @@
 "use strict";
 
-var productionMode = (process.env.DEVELOPMENT==='undefined');
+var productionMode = (process.env.DEVELOPMENT!=='undefined');
 console.log("mode is ",process.env.DEVELOPMENT);
 
 require("./grid").run({
