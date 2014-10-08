@@ -352,6 +352,7 @@ exports.run = function (c) {
     var options = {};
 
     if (_conf.productionMode){
+      console.log("Push Notification production version");
       options = { "production": _conf.productionMode,"key":_conf.push_key,"cert":_conf.push_cert, "ca":_conf.push_ca };
     }else{
       options = { "production": _conf.productionMode,"key":_conf.push_dev_key,"cert":_conf.push_dev_cert };

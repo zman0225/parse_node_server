@@ -1,7 +1,7 @@
 "use strict";
 
 var productionMode = (process.env.DEVELOPMENT!=='undefined');
-console.log("mode is ",process.env.DEVELOPMENT);
+console.log("mode is ",process.env.DEVELOPMENT,productionMode);
 
 require("./grid").run({
   "developmentPort":8000,
