@@ -619,6 +619,7 @@ exports.saveObject = function (req, res) {
               
               var sender = _safe(fset.messageSenderName,fset.messageSender);
               note.payload = {'msgFrom': sender,'msgType':fset.messageType};
+              console.log("tokens",tokens);
               for (var y in tokens) {
                 if(tokens[y].hasOwnProperty('userDeviceTokens')){
                   for(var x in tokens[y].userDeviceTokens){
