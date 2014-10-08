@@ -370,18 +370,18 @@ exports.run = function (c) {
     });
 
     //setup feedback
-    // var options = {
-    //     "batchFeedback": true,
-    //     "interval": 300
-    // };
+    var options = {
+        "batchFeedback": true,
+        "interval": 300
+    };
 
-    // var feedback = new apn.Feedback(options);
-    // feedback.on("feedback", function(devices) {
-    //     devices.forEach(function(item) {
-    //         // Do something with item.device and item.time;
-    //         console.log("failed to deliver to device "+item.device+" at time: "+item.time);
-    //     });
-    // });
+    var feedback = new apn.Feedback(options);
+    feedback.on("feedback", function(devices) {
+        devices.forEach(function(item) {
+            // Do something with item.device and item.time;
+            console.log("failed to deliver to device "+item.device+" at time: "+item.time);
+        });
+    });
 
   });
 };
